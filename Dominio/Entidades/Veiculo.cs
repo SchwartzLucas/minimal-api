@@ -11,7 +11,7 @@ public class Veiculo{
 
     [Required]
     [StringLength(150)]
-    public string Nome { get; set; } = default;        
+    public string Nome { get; set; } = default;
     
     [Required]
     [StringLength(100)]
