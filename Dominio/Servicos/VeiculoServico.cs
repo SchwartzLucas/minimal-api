@@ -6,7 +6,7 @@ using MinimalApi.Infraestrutura.Db;
 
 namespace MinimalApi.Dominio.Servicos;
 
-public class VeiculoServico : iveiculoServico{
+public class VeiculoServico : iVeiculoServico{
 
     private readonly DbContexto _contexto;
     public VeiculoServico(DbContexto contexto){
@@ -36,7 +36,7 @@ public class VeiculoServico : iveiculoServico{
         _contexto.SaveChanges();
     }
 
-    public List<Veiculo> Todos(int pagina = 1, string? nome = null, string? marca = null)
+    public List<Veiculo> Todos(int? pagina = 1, string? nome = null, string? marca = null)
     {
         var query = _contexto.Veiculos.AsQueryable();
         if(!string.IsNullOrEmpty(nome)){
@@ -45,8 +45,9 @@ public class VeiculoServico : iveiculoServico{
 
         int ItensPorPagina = 10;
 
-        query = query.Skip(pagina - 1 * ItensPorPagina).Take(ItensPorPagina);
-
+        if(pagina != null){
+            query = query.Skip((int)pagina - 1 * ItensPorPagina).Take(ItensPorPagina);
+        }
         return query.ToList();
     }
 }

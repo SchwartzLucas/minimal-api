@@ -3,8 +3,8 @@ using MinimalApi.DTOs;
 
 namespace MinimalApi.Dominio.Interfaces;
 
-public interface iveiculoServico{
-    List<Veiculo> Todos(int pagina = 1, string? nome = null , string? marca = null);
+public interface iVeiculoServico{
+    List<Veiculo> Todos(int? pagina = 1, string? nome = null , string? marca = null);
     
     Veiculo? BuscaPorId(int id);
     
