@@ -6,6 +6,7 @@ using MinimalApi.Dominio.Servicos;
 using Microsoft.AspNetCore.Mvc;
 using MinimalApi.Dominio.ModelViews;
 using MinimalApi.Dominio.Entidades;
+using MinimalApi.Dominio.Enuns;
 
 #region Builder
 
@@ -43,6 +44,20 @@ app.MapPost("/administradores/login", ( [FromBody] LoginDTO loginDTO, [FromServi
     }
 }).WithTags("Administradores");
 
+app.MapGet("/administradores", ( [FromQuery] int? pagina, [FromServices] iAdministradorServico administradorServico) => {
+    return Results.Ok(administradorServico.Todos(pagina));
+}).WithTags("Administradores");
+
+app.MapGet("/administradores/{id}", ( [FromRoute] int id, iAdministradorServico administradorServico) => {
+    
+    var administrador = administradorServico.BuscaPorId(id);
+
+    if(administrador == null) return Results.NotFound();
+
+    return Results.Ok(administrador);
+
+}).WithTags("Administradores");
+
 app.MapPost("/administradores", ( [FromBody] AdministradorDTO administradorDTO, [FromServices] iAdministradorServico administradorServico) => {
     var validacao = new ErrosDeValidacao{
         Mensagens = new List<string>()
@@ -54,23 +69,23 @@ app.MapPost("/administradores", ( [FromBody] AdministradorDTO administradorDTO, 
     if(string.IsNullOrEmpty(administradorDTO.Senha)){
         validacao.Mensagens.Add("Senha não pode ser vazia");
     }
-    if(string.IsNullOrEmpty(administradorDTO.Perfil)){
+    if(administradorDTO.Perfil == null){
         validacao.Mensagens.Add("Perfil não pode ser vazio");
     }
 
     if(validacao.Mensagens.Count > 0){
         return Results.BadRequest(validacao);
     }
-
+    
     var administrador = new Administrador{
         Email = administradorDTO.Email,
         Senha = administradorDTO.Senha,
-        Perfil = administradorDTO.Perfil.ToString()
+        Perfil = administradorDTO.Perfil.ToString() ?? Perfil.editor.ToString()
     };
     
-    administradorServico.Incluir(veiculo);
+    administradorServico.Incluir(administrador);
 
-    return Results.Created($"/veiculo/{veiculo.Id}", veiculo);          
+    return Results.Created($"/administrador/{administrador.Id}", administrador);          
    
 }).WithTags("Administradores");
 #endregion
