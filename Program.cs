@@ -45,7 +45,18 @@ app.MapPost("/administradores/login", ( [FromBody] LoginDTO loginDTO, [FromServi
 }).WithTags("Administradores");
 
 app.MapGet("/administradores", ( [FromQuery] int? pagina, [FromServices] iAdministradorServico administradorServico) => {
-    return Results.Ok(administradorServico.Todos(pagina));
+    var adms = new List<AdministradorModelView>();
+    var administradores = administradorServico.Todos(pagina);
+    foreach(var adm in administradores){
+
+        adms.Add(new AdministradorModelView{
+            Email = adm.Email,
+            Perfil = adm.Perfil,
+            Id = adm.Id
+        });
+
+    }
+    return Results.Ok(adms);
 }).WithTags("Administradores");
 
 app.MapGet("/administradores/{id}", ( [FromRoute] int id, iAdministradorServico administradorServico) => {
@@ -54,7 +65,11 @@ app.MapGet("/administradores/{id}", ( [FromRoute] int id, iAdministradorServico 
 
     if(administrador == null) return Results.NotFound();
 
-    return Results.Ok(administrador);
+    return Results.Ok(new AdministradorModelView{
+            Email = administrador.Email,
+            Perfil = administrador.Perfil,
+            Id = administrador.Id
+        });
 
 }).WithTags("Administradores");
 
@@ -80,12 +95,16 @@ app.MapPost("/administradores", ( [FromBody] AdministradorDTO administradorDTO, 
     var administrador = new Administrador{
         Email = administradorDTO.Email,
         Senha = administradorDTO.Senha,
-        Perfil = administradorDTO.Perfil.ToString() ?? Perfil.editor.ToString()
+        Perfil = administradorDTO.Perfil.ToString() ?? Perfil.Editor.ToString()
     };
     
     administradorServico.Incluir(administrador);
 
-    return Results.Created($"/administrador/{administrador.Id}", administrador);          
+    return Results.Created($"/administrador/{administrador.Id}", new AdministradorModelView{
+            Email = administrador.Email,
+            Perfil = administrador.Perfil,
+            Id = administrador.Id
+        });          
    
 }).WithTags("Administradores");
 #endregion
