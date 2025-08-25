@@ -28,12 +28,18 @@ public class AdministradorServico : iAdministradorServico{
     public List<Administrador> Todos(int? pagina)
     {
         var query = _contexto.Administradores.AsQueryable();
-
         int ItensPorPagina = 10;
 
-        if(pagina != null){
-            query = query.Skip((int)pagina - 1 * ItensPorPagina).Take(ItensPorPagina);
+        if (pagina.HasValue && pagina.Value > 0)
+        {
+            int p = (pagina.Value - 1) * ItensPorPagina;
+            query = query.Skip(p).Take(ItensPorPagina);
         }
+        else
+        {
+            query = query.Take(ItensPorPagina);
+        }
+
         return query.ToList();
     }
 
